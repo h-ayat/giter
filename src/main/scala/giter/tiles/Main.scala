@@ -5,6 +5,7 @@ import p752.Tile
 import p752.KeyEvent
 import giter.tiles.Main.State.MenuState
 import giter.tiles.Main.State.BranchState
+import giter.Logic
 
 object Main extends Tile[KeyEvent, Main.State, EngineEvent]:
   def defaultState(): State = State.BranchState(BranchSelect.defaultState())
@@ -20,17 +21,19 @@ object Main extends Tile[KeyEvent, Main.State, EngineEvent]:
       case MenuState(s) =>
         val (newS, ress) = Menu.update(event, s)
         ress match
-          case None => 
+          case None =>
             State.MenuState(newS) -> EngineEvent.Pass
           case Some(value) =>
             value match
-              case MenuItem.Fetch => ???
-              case MenuItem.Update => ???
-              case MenuItem.Select => 
+              case MenuItem.Fetch =>
+                Logic.fetch()
                 defaultState() -> EngineEvent.Pass
-              case MenuItem.Terminate => 
+              case MenuItem.Update => ???
+              case MenuItem.Select =>
+                defaultState() -> EngineEvent.Pass
+              case MenuItem.Terminate =>
                 state -> EngineEvent.Terminate
-            
+
       case BranchState(s) =>
         val (newS, res) = BranchSelect.update(event, s)
         res match

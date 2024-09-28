@@ -10,12 +10,13 @@ object Logic:
     Using(
       scala.io.Source.fromFile(System.getenv("HOME") + "/.config/giter.conf")
     ) { l =>
-      val map = l.getLines()
+      val map = l
+        .getLines()
         .map(_.split("="))
         .filter(_.length == 2)
         .map(s => s(0) -> s(1))
         .toMap
-        map("root") -> map("origin")
+      map("root") -> map("origin")
     }
   }.get
 
@@ -61,7 +62,16 @@ object Logic:
       treeMap.getOrElse(name, localMap.getOrElse(name, remoteMap(name)))
     )
 
-  def open(branch: Branch): Unit = {
+  def fetch(): Unit =
+    Process(
+      Seq(
+        "zsh",
+        "-c",
+        s"kitty --directory='$root' -e git fetch --all"
+      )
+    ).!<
+
+  def open(branch: Branch): Unit =
     if branch.mode == BranchMode.Tree then
       val addr = root + "/" + branch.name
       val command = Seq(
@@ -90,6 +100,6 @@ object Logic:
         s"(setsid nohup kitty --directory='$addr' >/dev/null 2>&1 & disown) & disown"
       )
       val _ = Process(command).run()
+  end open
 
-  }
 end Logic

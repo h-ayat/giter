@@ -28,7 +28,7 @@ object BranchSelect
   type State = AutoComplete.State[Branch]
   enum Result:
     case Change, Pass, Exit
-  private val branches = Logic.branches.toList
+  private def branches = Logic.branches.toList
   def defaultState(): State = AutoComplete.defaultState(branches)
 
   private def renderBranch(branch: Branch): String = 
