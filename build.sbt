@@ -1,10 +1,9 @@
-scalaVersion := "3.3.3"
+scalaVersion := "3.3.6"
 
-name := "tim"
+name := "giter"
 
 libraryDependencies ++= Seq(
-  "io.github.h-ayat" %%% "p752-tiles" % "0.4.2",
-  "org.scala-native" % "nativelib_native0.5_3" % "0.5.5"
+  "io.github.h-ayat" %%% "p752-tiles" % "0.4.4"
 )
 
 

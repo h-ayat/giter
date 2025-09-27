@@ -6,7 +6,7 @@ import scala.util.Using
 
 object Logic:
 
-  val (root, remoteName) = {
+  val (root, remoteName, exec, open, workdir) = {
     Using(
       scala.io.Source.fromFile(System.getenv("HOME") + "/.config/giter.conf")
     ) { l =>
@@ -16,7 +16,7 @@ object Logic:
         .filter(_.length == 2)
         .map(s => s(0) -> s(1))
         .toMap
-      map("root") -> map("origin")
+      (map("root"), map("origin"), map("exec"), map("open"), map("workdir"))
     }
   }.get
 
@@ -67,39 +67,37 @@ object Logic:
       Seq(
         "zsh",
         "-c",
-        s"kitty --directory='$root' -e git fetch --all"
+        s"$open '$root' -e git fetch --all"
       )
     ).!<
 
   def open(branch: Branch): Unit =
+    import branch.name
+    val addr = workdir + "/" + name
     if branch.mode == BranchMode.Tree then
-      val addr = root + "/" + branch.name
       val command = Seq(
         "setsid",
         "nohup",
         "bash",
         "-c",
-        s"(setsid nohup kitty --directory='$addr' >/dev/null 2>&1 & disown) & disown"
+        s"(setsid nohup $open '$addr' >/dev/null 2>&1 & disown) & disown"
       )
       val _ = Process(command).run()
     else
-      val name = branch.name
-      val addr = root + "/" + name
-      Process(
-        Seq(
-          "bash",
-          "-c",
-          s"cd $root && git worktree add $name o/$name && cd $name && git checkout $name"
-        )
-      ).!
-      val command = Seq(
+      val command0 = Seq(
+        "zsh",
+        "-c",
+        s"$exec wm add $name"
+      )
+      Process(command0).run()
+      val command1 = Seq(
         "setsid",
         "nohup",
         "bash",
         "-c",
-        s"(setsid nohup kitty --directory='$addr' >/dev/null 2>&1 & disown) & disown"
+        s"(setsid nohup $open '$addr' >/dev/null 2>&1 & disown) & disown"
       )
-      val _ = Process(command).run()
+      Process(command1).run()
   end open
 
 end Logic
