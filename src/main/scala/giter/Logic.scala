@@ -89,7 +89,7 @@ object Logic:
         "-c",
         s"$exec wm add $name"
       )
-      Process(command0).run()
+      Process(command0).run().exitValue()
       val command1 = Seq(
         "setsid",
         "nohup",
